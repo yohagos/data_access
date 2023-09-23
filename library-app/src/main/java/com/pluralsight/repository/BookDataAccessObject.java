@@ -20,7 +20,7 @@ public class BookDataAccessObject
         try (
             Connection con = getConnection();
             Statement stmt = con.createStatement();
-            ResultSet rset = stmt.executeQuery(sql);
+            ResultSet rset = stmt.executeQuery(sql)
             ) {
             books = new ArrayList<>();
             while(rset.next()) {
@@ -38,15 +38,15 @@ public class BookDataAccessObject
 
     @Override
     public Optional<Book> findByID(long id) {
-        Optional<Book> optBook  = Optional.empty();
+        Optional<Book> optBook;
         String sql = "Select ID, TITLE from BOOK where ID = ?";
 
         try (
                 Connection con = getConnection();
-                PreparedStatement pstmt = con.prepareStatement(sql);
+                PreparedStatement pstmt = con.prepareStatement(sql)
                 ) {
             pstmt.setLong(1, id);
-            try (ResultSet rset = pstmt.executeQuery();) {
+            try (ResultSet rset = pstmt.executeQuery()) {
                 Book resBook = new Book();
                 if (rset.next()) {
                     resBook.setId(rset.getLong("id"));
@@ -58,5 +58,28 @@ public class BookDataAccessObject
             throw new RuntimeException(e);
         }
         return optBook;
+    }
+
+    @Override
+    public Book create(Book book) {
+        String sql = "insert into BOOK (TITLE) values (?)";
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+                ) {
+            preparedStatement.setString(1, book.getTitle());
+            preparedStatement.executeUpdate();
+
+            try (ResultSet genKeys = preparedStatement.getGeneratedKeys()) {
+                if (genKeys.next()) {
+                    book.setId(genKeys.getLong(1));
+                }
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+
+        return book;
     }
 }

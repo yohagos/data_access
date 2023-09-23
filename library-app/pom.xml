@@ -10,7 +10,6 @@
 
   <name>library-app</name>
   <description>A simple library-app.</description>
-  <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
   <properties>

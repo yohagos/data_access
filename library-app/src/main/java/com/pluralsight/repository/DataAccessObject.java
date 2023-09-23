@@ -8,4 +8,6 @@ public interface DataAccessObject<T> {
 
     Optional<T> findByID(long id);
 
+    T create(T t);
+
 }

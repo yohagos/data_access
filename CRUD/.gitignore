@@ -28,5 +28,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-*/.idea
-/data_access/library-app/target/*
+/data_access/.idea
+/data_access/library-app/target/

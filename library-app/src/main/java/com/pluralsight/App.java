@@ -20,5 +20,10 @@ public class App {
             Book book = optBook.get();
             System.out.println(book);
         }
+
+        /*Book newBook = new Book();
+        newBook.setTitle("The Alchemist");
+        newBook = bookDao.create(newBook);
+        System.out.println(newBook.toString());*/
     }
 }
