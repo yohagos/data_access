@@ -27,6 +27,7 @@ public class BookDataAccessObject
                 Book book = new Book();
                 book.setId(rset.getLong("id"));
                 book.setTitle(rset.getString("title"));
+                book.setRating(rset.getInt("rating"));
                 books.add(book);
             }
         } catch (SQLException se) {
@@ -100,5 +101,69 @@ public class BookDataAccessObject
         }
 
         return book;
+    }
+
+    @Override
+    public int[] update(List<Book> books) {
+        int[] records = {};
+        String sql = "Update BOOK SET TITLE = ?, RATING = ? WHERE ID = ?";
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                ) {
+            for (Book book: books) {
+                preparedStatement.setString(1, book.getTitle());
+                preparedStatement.setInt(2, book.getRating());
+                preparedStatement.setLong(3, book.getId());
+
+                preparedStatement.addBatch();
+            }
+            records = preparedStatement.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return records;
+    }
+
+    @Override
+    public int delete(Book book) {
+        int rowsAffected = 0;
+        String sql = "DELETE from BOOK Where ID = ?";
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                ) {
+            preparedStatement.setLong(1, book.getId());
+            rowsAffected = preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rowsAffected;
+    }
+
+    @Override
+    public int[] deleteBulk(List<Book> books) {
+        int[] rowsAffected = {};
+        String sql = "Delete from BOOK where ID = ?";
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                ) {
+            for (Book book: books) {
+                preparedStatement.setLong(1, book.getId());
+                preparedStatement.addBatch();
+            }
+            rowsAffected = preparedStatement.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rowsAffected;
     }
 }

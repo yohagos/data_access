@@ -5,6 +5,16 @@ public class Book {
     private long id;
     private String title;
 
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    private int rating;
+
     public long getId() {
         return id;
     }
@@ -23,6 +33,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return "ID: " + getId() + ", Title: " + getTitle();
+        return "ID: " + getId() + ", Title: " + getTitle() + " , Rating: " + getRating();
     }
 }
