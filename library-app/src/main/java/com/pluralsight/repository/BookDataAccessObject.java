@@ -12,7 +12,7 @@ public class BookDataAccessObject
         extends AbstractDataAccessObject
         implements DataAccessObject<Book>{
 
-    @Override
+    /*@Override
     public List<Book> findAll() {
         List<Book> books = Collections.emptyList();
         String sql = "Select * from BOOK";
@@ -35,9 +35,30 @@ public class BookDataAccessObject
         }
 
         return books;
-    }
+    }*/
 
     @Override
+    public List<Book> findAll() {
+        String sql = "SELECT ID, TITLE, RATING FROM BOOK";
+        List<Book> books;
+
+        JDBCQueryTemplate<Book> template = new JDBCQueryTemplate<>() {
+            @Override
+            public Book mapItem(ResultSet resultSet) throws SQLException {
+                Book book = new Book();
+                book.setId(resultSet.getLong("id"));
+                book.setTitle(resultSet.getString("title"));
+                book.setRating(resultSet.getInt("rating"));
+                return book;
+            }
+        };
+
+        books = template.queryForList(sql);
+
+        return books;
+    }
+
+    /*@Override
     public Optional<Book> findByID(long id) {
         Optional<Book> optBook;
         String sql = "Select ID, TITLE from BOOK where ID = ?";
@@ -59,9 +80,30 @@ public class BookDataAccessObject
             throw new RuntimeException(e);
         }
         return optBook;
-    }
+    }*/
 
     @Override
+    public Optional<Book> findByID(long id) {
+        Book foundItem;
+        String sql = "Select ID, TITLE, RATING from BOOK where ID = ?";
+
+        JDBCQueryTemplate<Book> book = new JDBCQueryTemplate<>() {
+            @Override
+            public Book mapItem(ResultSet resultSet) throws SQLException {
+                Book nBook = new Book();
+                if (resultSet.next()){
+                    nBook.setId(resultSet.getLong("id"));
+                    nBook.setTitle(resultSet.getString("title"));
+                    nBook.setRating(resultSet.getInt("rating"));
+                }
+                return nBook;
+            }
+        };
+
+        return Optional.of(book.queryFindByID(id, sql));
+    }
+
+    /*@Override
     public Book create(Book book) {
         String sql = "insert into BOOK (TITLE) values (?)";
 
@@ -80,6 +122,24 @@ public class BookDataAccessObject
         } catch (SQLException se) {
             se.printStackTrace();
         }
+
+        return book;
+    }*/
+
+    @Override
+    public Book create(Book book) {
+        String sql = "Insert into BOOK (TITLE, RATING) values (?,?)";
+
+        JDBCQueryTemplate<Book> jdbcBook = new JDBCQueryTemplate<>() {
+            @Override
+            public Book mapItem(ResultSet resultSet) throws SQLException {
+                Book newBook = new Book();
+                newBook.setTitle(resultSet.getString("title"));
+                newBook.setRating(resultSet.getInt("rating"));
+                return newBook;
+            }
+        };
+        book.setId(jdbcBook.queryCreateItem(book.getTitle(), book.getRating(), sql));
 
         return book;
     }
