@@ -10,4 +10,6 @@ public interface DataAccessObject<T> {
 
     T create(T t);
 
+    T update(T t);
+
 }

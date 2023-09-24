@@ -82,4 +82,23 @@ public class BookDataAccessObject
 
         return book;
     }
+
+    @Override
+    public Book update(Book book) {
+        String sql = "Update BOOK set TITLE = ? WHERE ID = ?";
+
+        try (
+                Connection con = getConnection();
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                ) {
+            preparedStatement.setString(1, book.getTitle());
+            preparedStatement.setLong(2, book.getId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return book;
+    }
 }
